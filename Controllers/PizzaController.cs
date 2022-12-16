@@ -7,46 +7,46 @@ namespace PizzaApi.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class PizzaController : ControllerBase {
-    public PizzaController() { }
+  public PizzaController() { }
 
-    [HttpGet]
-    public ActionResult<List<Pizza>> GetAll() => PizzaService.GetAll();
+  [HttpGet]
+  public ActionResult<List<Pizza>> GetAll() => PizzaService.GetAll();
 
-    [HttpGet("{id:int}")]
-    public ActionResult<Pizza?> Get(int id) {
-        var pizza = PizzaService.Get(id);
-        return pizza is null ? NotFound() : pizza;
+  [HttpGet("{id:int}")]
+  public ActionResult<Pizza?> Get(int id) {
+    var pizza = PizzaService.Get(id);
+    return pizza is null ? NotFound() : pizza;
+  }
+
+  [HttpPost]
+  public IActionResult Create(Pizza pizza) {
+    PizzaService.Add(pizza);
+    return CreatedAtAction(nameof(Get), new { id = pizza.Id }, pizza);
+  }
+
+  [HttpPut("{id:int}")]
+  public IActionResult Update(int id, Pizza pizza) {
+    if (id != pizza.Id) {
+      return BadRequest();
     }
 
-    [HttpPost]
-    public IActionResult Create(Pizza pizza) {
-        PizzaService.Add(pizza);
-        return CreatedAtAction(nameof(Get), new { id = pizza.Id }, pizza);
+    var existingPizza = PizzaService.Get(id);
+    if (existingPizza is null) {
+      return NotFound();
     }
 
-    [HttpPut("{id:int}")]
-    public IActionResult Update(int id, Pizza pizza) {
-        if (id != pizza.Id) {
-            return BadRequest();
-        }
+    PizzaService.Update(pizza);
+    return NoContent();
+  }
 
-        var existingPizza = PizzaService.Get(id);
-        if (existingPizza is null) {
-            return NotFound();
-        }
-
-        PizzaService.Update(pizza);
-        return NoContent();
+  [HttpDelete("{id:int}")]
+  public IActionResult Delete(int id) {
+    var pizza = PizzaService.Get(id);
+    if (pizza is null) {
+      return NotFound();
     }
 
-    [HttpDelete("{id:int}")]
-    public IActionResult Delete(int id) {
-        var pizza = PizzaService.Get(id);
-        if (pizza is null) {
-            return NotFound();
-        }
-
-        PizzaService.Delete(id);
-        return NoContent();
-    }
+    PizzaService.Delete(id);
+    return NoContent();
+  }
 }
